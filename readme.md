@@ -12,10 +12,18 @@
       <img src="https://img.shields.io/pypi/v/nano-graphrag.svg">
     </a>
     <a href="https://codecov.io/github/gusye1234/nano-graphrag" > 
- <img src="https://codecov.io/github/gusye1234/nano-graphrag/graph/badge.svg?token=YFPMj9uQo7"/> 
- </a>
+     <img src="https://codecov.io/github/gusye1234/nano-graphrag/graph/badge.svg?token=YFPMj9uQo7"/> 
+ 		</a>
     <a href="https://pepy.tech/project/nano-graphrag">
       <img src="https://static.pepy.tech/badge/nano-graphrag/month">
+    </a>
+  </p>
+  <p>
+  	<a href="https://discord.gg/nY6GDChP">
+      <img src="https://dcbadge.limes.pink/api/server/nY6GDChP?style=flat">
+    </a>
+    <a href="https://github.com/gusye1234/nano-graphrag/issues/8">
+       <img src="https://img.shields.io/badge/群聊-wechat-green">
     </a>
   </p>
 </div>
@@ -92,6 +100,12 @@ print(graph_func.query("What are the top themes in this story?", param=QueryPara
 ```
 
 Next time you initialize a `GraphRAG` from the same `working_dir`, it will reload all the contexts automatically.
+
+#### Batch Insert
+
+```python
+graph_func.insert(["TEXT1", "TEXT2",...])
+```
 
 <details>
 <summary> Incremental Insert</summary>
