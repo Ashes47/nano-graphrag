@@ -15,7 +15,7 @@ from .base import BaseKVStorage
 
 
 @retry(
-    stop=stop_after_attempt(3),
+    stop=stop_after_attempt(5),
     wait=wait_exponential(multiplier=1, min=4, max=10),
     retry=retry_if_exception_type((RateLimitError, APIConnectionError)),
 )
@@ -43,6 +43,7 @@ async def openai_complete_if_cache(
         await hashing_kv.upsert(
             {args_hash: {"return": response.choices[0].message.content, "model": model}}
         )
+        await hashing_kv.index_done_callback()
     return response.choices[0].message.content
 
 
@@ -72,7 +73,7 @@ async def gpt_4o_mini_complete(
 
 @wrap_embedding_func_with_attrs(embedding_dim=1536, max_token_size=8192)
 @retry(
-    stop=stop_after_attempt(3),
+    stop=stop_after_attempt(5),
     wait=wait_exponential(multiplier=1, min=4, max=10),
     retry=retry_if_exception_type((RateLimitError, APIConnectionError)),
 )
@@ -118,6 +119,7 @@ async def azure_openai_complete_if_cache(
                 }
             }
         )
+        await hashing_kv.index_done_callback()
     return response.choices[0].message.content
 
 
