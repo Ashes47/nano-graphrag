@@ -14,7 +14,7 @@ from ._utils import (
     list_of_list_to_csv,
     pack_user_ass_to_openai_messages,
     split_string_by_multi_markers,
-    truncate_list_by_token_size
+    truncate_list_by_token_size,
 )
 from .base import (
     BaseGraphStorage,
@@ -80,7 +80,7 @@ async def _handle_single_entity_extraction(
     record_attributes: list[str],
     chunk_key: str,
 ):
-    if record_attributes[0] != '"entity"' or len(record_attributes) < 4:
+    if len(record_attributes) < 4 or record_attributes[0] != '"entity"':
         return None
     # add this record as a node in the G
     entity_name = clean_str(record_attributes[1].upper())
@@ -101,7 +101,7 @@ async def _handle_single_relationship_extraction(
     record_attributes: list[str],
     chunk_key: str,
 ):
-    if record_attributes[0] != '"relationship"' or len(record_attributes) < 5:
+    if len(record_attributes) < 5 or record_attributes[0] != '"relationship"':
         return None
     # add this record as edge
     source = clean_str(record_attributes[1].upper())
@@ -213,10 +213,7 @@ async def _merge_edges_then_upsert(
         src_id,
         tgt_id,
         edge_data=dict(
-            weight=weight,
-            description=description,
-            source_id=source_id,
-            order=order
+            weight=weight, description=description, source_id=source_id, order=order
         ),
     )
 
