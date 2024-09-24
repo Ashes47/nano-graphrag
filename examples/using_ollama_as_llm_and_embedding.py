@@ -1,17 +1,24 @@
 import os
+import sys
+
+sys.path.append("..")
 import logging
 import ollama
-from nano_graphrag import GraphRAG, QueryParam
+import numpy as np
 from nano_graphrag import GraphRAG, QueryParam
 from nano_graphrag.base import BaseKVStorage
-from nano_graphrag._utils import compute_args_hash
+from nano_graphrag._utils import compute_args_hash, wrap_embedding_func_with_attrs
 
 logging.basicConfig(level=logging.WARNING)
 logging.getLogger("nano-graphrag").setLevel(logging.INFO)
 
-# !!! qwen2-7B maybe produce unparsable results and cause the extraction of graph to fail.
-MODEL = "qwen2"
+# Assumed llm model settings
+MODEL = "your_model_name"
 
+# Assumed embedding model settings
+EMBEDDING_MODEL = "nomic-embed-text"
+EMBEDDING_MODEL_DIM = 768
+EMBEDDING_MODEL_MAX_TOKENS = 8192
 
 async def ollama_model_if_cache(
     prompt, system_prompt=None, history_messages=[], **kwargs
@@ -57,6 +64,7 @@ def query():
         working_dir=WORKING_DIR,
         best_model_func=ollama_model_if_cache,
         cheap_model_func=ollama_model_if_cache,
+        embedding_func=ollama_embedding,
     )
     print(
         rag.query(
@@ -82,6 +90,7 @@ def insert():
         enable_llm_cache=True,
         best_model_func=ollama_model_if_cache,
         cheap_model_func=ollama_model_if_cache,
+        embedding_func=ollama_embedding,
     )
     start = time()
     rag.insert(FAKE_TEXT)
@@ -89,6 +98,19 @@ def insert():
     # rag = GraphRAG(working_dir=WORKING_DIR, enable_llm_cache=True)
     # rag.insert(FAKE_TEXT[half_len:])
 
+# We're using Ollama to generate embeddings for the BGE model
+@wrap_embedding_func_with_attrs(
+    embedding_dim= EMBEDDING_MODEL_DIM,
+    max_token_size= EMBEDDING_MODEL_MAX_TOKENS,
+)
+
+async def ollama_embedding(texts :list[str]) -> np.ndarray:
+    embed_text = []
+    for text in texts:
+      data = ollama.embeddings(model=EMBEDDING_MODEL, prompt=text)
+      embed_text.append(data["embedding"])
+    
+    return embed_text
 
 if __name__ == "__main__":
     insert()
